@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+  db:
+    container_name: db
+    image: postgres
+    networks:
+      - uav-rental-project-with-django
+    environment:
+    - POSTGRES_DB=uav-postgres-db
+    - POSTGRES_USER=uav-postgres
+    - POSTGRES_PASSWORD=uav-postgres
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d uav-postgres-db -U uav-postgres"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - data:/var/lib/postgresql/data 
+
+  app:
+    container_name: app
+    networks:
+      - uav-rental-project-with-django
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
+volumes:
+  data:
+
+networks:
+  uav-rental-project-with-django: 

@@ -63,7 +63,7 @@ def createInitialPartData(apps):
             )
             # Loop the aircrafts since each part should be defined for each aircraft specially
             for aircraft_index in range(0, len(aircrafts))
-            # Then, loop the parts and assign them to the aircrafts one to one
+            # Then, loop the parts and assign them to the aircrafts one on one
             for part_index in range(0, len(parts))
         ]
     )

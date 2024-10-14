@@ -4,6 +4,7 @@ services:
   db:
     container_name: db
     image: postgres
+    restart: always
     networks:
       - uav-rental-project-with-django
     environment:

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--begin::Head-->
+
+<head>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <base href="">
+    <title>Baykar HR | LOGIN </title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Baykar Human Resources" />
+    <meta name="keywords" content="Baykar Teknoloji, İnsan Kaynakları" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:locale" content="tr_TR" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Baykar HR " />
+    <meta property="og:url" content="kariyer.baykartech.com" />
+    <meta property="og:site_name" content="kariyer.baykartech.com" />
+    <meta property="og:description" content="Baykar Human Resources">
+    <meta property="og:image" content="https://cdnik.baykartech.com/media/images/contents/Baykar_favicon.png">
+    <link rel="canonical" href="kariyer.baykartech.com" />
+    <link rel="shortcut icon" href="https://cdnik.baykartech.com/media/images/contents/Baykar_favicon.png" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnik.baykartech.com/static/main_page/new_assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnik.baykartech.com/static/main_page/new_assets/css/modal-video.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.9.7/jquery.fullpage.min.css"
+        integrity="sha512-q54FvbV+gGBn+NvgaD4gpJ7w4wrO00DgW7Rx503PIhrf0CuMwLOwbS+bXgOBFSob+6GVy1HDPfaRLJ8w2jiS4g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnik.baykartech.com/static/main_page/new_assets/css/style_23.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
+        integrity="sha512-9BwLAVqqt6oFdXohPLuNHxhx36BVj5uGSGmizkmGkgl3uMSgNalKc/smum+GJU/TTP0jy0+ruwC3xNAk3F759A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .bgclas {
+            background-image: url(https://cdnik.baykartech.com/static/assets/media/bg_kizilelma.png);
+            background-position: bottom center;
+            background-repeat: no-repeat, no-repeat;
+        }
+
+        @media (max-width:768px) {
+            .bgclas {
+                background-image: url(https://cdnik.baykartech.com/static/assets/media/bg_kizilelma.png);
+                background-position: top center;
+                background-repeat: no-repeat, no-repeat;
+            }
+        }
+    </style>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?hl=en"></script>
+    <section class="loginSection"
+        style="background-image: url('https://cdnik.baykartech.com/static/main_page/new_assets/img/loginBg.png');">
+        <div class="overlay-color">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="loginLeft">
+                            <div class="LoginSlogan">
+                                <h3>LIGHT <span>UP</span></h3>
+                                <h4>THE SKY</h4>
+                            </div>
+                            <img src="https://cdnik.baykartech.com/media/images/accounts/Akinci_Render.png"
+                                class="akinci" alt="" />
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="loginRight">
+                            <div class="logo">
+                                <a href="/en">
+                                    <img src="https://cdnik.baykartech.com/media/images/contents/Baykar_Career-White.png"
+                                        alt="" />
+                                </a>
+                            </div>
+                            <div class="LoginHead">
+                                <h2>BAYKAR</h2>
+                                <h3>CAREER PLATFORM</h3>
+                            </div>
+                            <p class="resetText md-w-full">Login</p>
+                            <div class="InputContent">
+                                <form style="width: 100%" id="loginForm" method="POST">
+                                    {% csrf_token %}
+                                    <div class="mb-3" style="width: 330px">
+                                        <label class="form-label">E-mail</label>
+                                        <input type="email" name="login" required class="form-control"
+                                            aria-describedby="emailHelp" placeholder="Enter E-mail" />
+                                    </div>
+                                    <div class="mb-3" style="width: 330px; position: relative">
+                                        <label class="form-label">Password</label>
+                                        <div style="position: relative">
+                                            <input type="password" name="password" id="id_password" autocomplete="off"
+                                                required class="form-control" placeholder="Enter Password"
+                                                style="padding-right: 35px" />
+                                            <span id="showPassword" class="fas fa-eye-slash" style="
+                            position: absolute;
+                            top: 50%;
+                            right: 10px;
+                            transform: translateY(-50%);
+                            cursor: pointer;
+
+                          " onclick="togglePasswordVisibility()"></span>
+                                        </div>
+                                    </div>
+                                    <div class="LoginBottom">
+                                        <a class="pass" href="/en/hesaplar/password/reset/">Forgot my Password</a>
+                                    </div>
+                                    <div class="mb-10 mt-3  d-flex justify-content-center">
+                                        <script src="https://www.google.com/recaptcha/api.js"></script>
+                                        <script type="text/javascript">
+                                            // Submit function to be called, after reCAPTCHA was successful.
+                                            var onSubmit_ee3e7daaef824f2584172429c0c6e953 = token => {
+                                                console.log("reCAPTCHA validated for 'data-widget-uuid=\"ee3e7daaef824f2584172429c0c6e953\"'")
+                                            };
+                                        </script>
+                                        <div data-theme="dark" class="g-recaptcha"
+                                            data-sitekey="6LdhhKUfAAAAAIreH-uXgiW0dnew3N0KRD3F08j0" required
+                                            id="id_captcha" data-widget-uuid="ee3e7daaef824f2584172429c0c6e953"
+                                            data-callback="onSubmit_ee3e7daaef824f2584172429c0c6e953"
+                                            data-size="normal">
+                                        </div>
+                                    </div>
+                                    <div class="forgetButtons">
+                                        <button type="submit" class="login-btn">
+                                            LOGIN
+                                        </button>
+                                    </div>
+                                </form>
+                                <div class="createAccount">
+                                    <p>Not a Member ? <a href="/en/hesaplar/signup/">Create Account</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnik.baykartech.com/static/main_page/new_assets/js/script.js"></script>
+    </script>
+    <script>
+        const togglePasswordVisibility = () => {
+            const passwordInput = document.getElementById("id_password");
+            const icon = document.getElementById("showPassword");
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+
+                return;
+            }
+
+            passwordInput.type = "password";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        }
+    </script>
+    </body>
+    <!--end::Body-->
+
+</html>

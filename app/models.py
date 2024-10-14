@@ -41,7 +41,7 @@ class Aircraft(models.Model):
 class Part(models.Model):
     id = models.IntegerField(primary_key=True)
     # Each parts can be produced by one team
-    team = models.ForeignKey(Team, on_delete=models.PROTECT, to_field='id')
+    team = models.ForeignKey(Team, on_delete=models.PROTECT)
     # Each parts are produced specially for each aircrafts
     aircraft = models.ForeignKey(Aircraft, on_delete=models.PROTECT)
     name = models.CharField(null=False, max_length=255)

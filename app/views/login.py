@@ -45,6 +45,6 @@ class Login(View):
         if user.team.has_assemble_permission is True:
             # If the user has permission to see and produce the aircrafts, then go to this page as first
             return redirect("/aircrafts/")
-        
+
         # If the user logs successfully and hasn't permission to see aircraft processes, redirect to the parts page
         return redirect("/parts/")

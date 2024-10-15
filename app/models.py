@@ -70,8 +70,10 @@ class Aircraft_production(models.Model):
     aircraft = models.ForeignKey(Aircraft, on_delete=models.PROTECT)
     # The used parts information for producing the aircraft
     used_parts = models.ManyToManyField(Part)
-    # To store the status of whether the production is completed, waiting, or canceled. For now, only checking the completed status
+    # To store the status of whether the production is completed, waiting, or canceled. For now, only checking the completed/canceled status
     is_completed = models.BooleanField(default=False)
+    # To store the status of whether the production is canceled
+    is_canceled = models.BooleanField(default=False)
     # The related user id who gave the production order
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)

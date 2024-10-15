@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<style>
+    .list-titles {
+        font-weight: bold;
+        font-size: 16px;
+        text-decoration: underline;
+    }
+
+    @keyframes warning {
+        from {
+            background-color: rgb(246, 67, 67);
+        }
+
+        to {
+            background-color: rgb(245, 140, 70);
+        }
+    }
+
+    .missing-item {
+        animation: warning 5s infinite alternate-reverse;
+    }
+
+    .center-text {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+
+<body>
+    <div class="m-5">
+        <h1 class="d-flex justify-content-center text-decoration-underline">Aircrafts</h1>
+        <hr>
+        <table id="aircrafts-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <h1 class="d-flex justify-content-center text-decoration-underline">Aircraft Productions</h1>
+        <hr>
+        <table id="aircraft-productions-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="row">
+            <div class="col-6 mt-5">
+                <h1 class="d-flex justify-content-center text-decoration-underline">Assemble an aircraft</h1>
+                <div class="row align-items-center">
+                    <form method="get">
+                        {% csrf_token %}
+                        <div class="row align-items-center justify-content-center">
+                            <div class="col-6">
+                                <label class="form-label">Aircraft:</label>
+                                <select name="produce_aircraft_id" , id="produce_aircraft_id"
+                                    class="user-team-dropdown form-control" type="submit" required>
+                                    <option selected="selected" value="" selected disabled hidden>
+                                        Choose the part that you would like to add to stocks
+                                    </option>
+                                    {% for aircraft in aircrafts %}
+                                    <option value="{{ aircraft.id }}">
+                                        {{ aircraft.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label mt-3">Amount</label>
+                                <input class="w-100" value="1" type="number" name="amount_to_produce_aircraft" min="1"
+                                    onkeyup="if(value<0) value=1;" />
+                            </div>
+                            <div class="d-flex col-3 justify-content-end align-items-center h-100 mt-5">
+                                <button type="submit" id="show_requirements" class="btn btn-primary">
+                                    Check required parts
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {% if required_parts.count > 0 %}
+                    <h4 class="d-flex justify-content-center text-decoration-underline mt-5">Aircraft Information</h4>
+                    <div class="row fs-4">
+                        <div class="col-6 d-flex justify-content-center">
+                            Aircraft: &nbsp;
+                            <strong>{{ selected_aircraft.name}}</strong>
+                        </div>
+                        <div class="col-6 d-flex justify-content-center">
+                            Amount: &nbsp;
+                            <strong>{{ amount_to_produce_aircraft}}</strong>
+                        </div>
+                    </div>
+                    <h4 class="d-flex justify-content-center text-decoration-underline mt-2">Required Parts</h4>
+                    <div class="row list-titles">
+                        <div class="col-1"></div>
+                        <div class="col-4">Part Name</div>
+                        <div class="col-2 center-text">Required Amount</div>
+                        <div class="col-2 center-text">Stock Amount</div>
+                        <div class="col-3 center-text">Status</div>
+                    </div>
+                    {% endif %}
+                    {% for required_part in required_parts %}
+                    <div
+                        class="row mt-2 p-3 {% if amount_to_produce_aircraft > required_part.count %} missing-item {% endif %}">
+                        <div class="col-1 center-text">{{ forloop.counter }}.</div>
+                        <div class="col-4">{{ required_part.part.name }}</div>
+                        <div class="col-2 center-text">{{ amount_to_produce_aircraft }}</div>
+                        <div class="col-2 center-text">{{ required_part.count }}</div>
+                        <div class="col-3 center-text">
+                            {% if amount_to_produce_aircraft > required_part.count %}
+                            Missing Part!
+                            {% else %}
+                            Ready!
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if is_available_to_reproduce is True %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input hidden value="{{ produce_aircraft_id }}" name="produce_aircraft_id" />
+                        <input hidden value="{{ amount_to_produce_aircraft }}" name="amount_to_produce_aircraft" />
+                        <div class="d-flex justify-content-center align-items-center mt-3">
+                            <button type="submit" id="show_requirements" class="btn btn-primary">
+                                Assembly
+                                {% if amount_to_produce_aircraft > 1 %}
+                                aircrafts
+                                {% else %}
+                                aircraft
+                                {% endif%}
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script language="javascript">
+        $(document).ready(function () {
+            $('#aircrafts-table').dataTable({
+                serverSide: true,
+                sAjaxSource: "http://localhost:8000/aircraftsData/",
+                columns: [
+                    {
+                        name: "name",
+                        data: 0
+                    },
+                    {
+                        name: "description",
+                        data: 1
+                    }
+                ]
+            });
+        });
+        $(document).ready(function () {
+            $('#aircraft-productions-table').dataTable({
+                serverSide: true,
+                sAjaxSource: "http://localhost:8000/aircraftProductionsData/",
+                columns: [
+                    {
+                        name: "name",
+                        data: 0
+                    },
+                    {
+                        name: "description",
+                        data: 1
+                    }
+                ]
+            });
+        });
+    </script>
+</body>
+
+</html>

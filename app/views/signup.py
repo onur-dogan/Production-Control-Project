@@ -1,13 +1,19 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
+from django.contrib.auth.hashers import make_password
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.views import View
 from ..models import Team, User
 from ..serializers import TeamSerializer
-from ..forms import UserForm
 
 
 class SignUp(View):
     def get(self, request):
+            # Check whether the user logged in to the system
+        user_id = request.session["user_id"]
+        # If the user has already logged in, then redirect it to one of the main windows
+        if user_id is not None:
+            return redirect("/parts/")
+
         teams = Team.objects.all()
         serializer = TeamSerializer(teams, many=True)
 
@@ -28,11 +34,27 @@ class SignUp(View):
             if is_user_exist is True:
                 return redirect("/login/")
 
-            new_user = UserForm(request.POST)
+            # Get informations from request body
+            team = request.POST.get("team")
+            name = request.POST.get("name")
+            surname = request.POST.get("surname")
 
-            if new_user.is_valid():
-                new_user.save()
-                return redirect("/login/")
+            # Hash the password to store it hashed in DB
+            hashed_password = make_password(password)
+
+            # Create a new user model
+            new_user = User.objects.create(
+                team_id=team,
+                name=name,
+                surname=surname,
+                email=email,
+                password=hashed_password,
+            )
+
+            # Save new user into the system
+            new_user.save()
+            # After register processes are done properly, redirect user to the login page to log in to the system
+            return redirect("/login/")
         except Exception as error:
             # If any error occurs, return
             print("An error occurred while saving the user", error)

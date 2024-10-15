@@ -23,7 +23,10 @@ class Parts(View):
             part__team_id=user.team_id
         ).order_by("part__name")
 
-        data = {"available_parts_with_stocks": available_parts_with_stocks}
+        data = {
+            "available_parts_with_stocks": available_parts_with_stocks,
+            "has_assemble_permission": user.team.has_assemble_permission,
+        }
         return render(request, "parts/index.html", data)
 
     def post(self, request):

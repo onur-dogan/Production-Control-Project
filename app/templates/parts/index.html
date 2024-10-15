@@ -8,10 +8,27 @@
     {% bootstrap_css %}
     {% bootstrap_javascript %}
 </head>
+<style>
+    .logout-button {
+        position: absolute;
+        right: .50rem;
+        top: 3%;
+        width: 300px;
+        height: 50px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
 
 <body>
     <div class="m-5">
+        {% if has_assemble_permission is True %}
+        <a href="/aircrafts/" style="position: absolute;"> See Aircrafts --></a>
+        {% endif %}
         <h1 class="d-flex justify-content-center text-decoration-underline">Parts</h1>
+        <a href="/logout/" class="btn btn-info logout-button"> Logout </a>
         <hr>
         <table id="parts-table">
             <thead>
@@ -71,7 +88,8 @@
                                     Choose the part that you would like to remove from stocks
                                 </option>
                                 {% for available_part_with_stock in available_parts_with_stocks %}
-                                <option value="{{ available_part_with_stock.id }}" {% if available_part_with_stock.count is 0 %}disabled{% endif %}>
+                                <option {% if available_part_with_stock.count is 0 %} disabled {% endif %}
+                                    value="{{ available_part_with_stock.id }}">
                                     {{ available_part_with_stock.part.name }} -
                                     (Stock Count: {{available_part_with_stock.count}})
                                 </option>

@@ -12,13 +12,13 @@ from .viewsets import (
 )
 from .views.login import Login
 from .views.signup import SignUp
-from .views.parts import Parts, PartListView
+from .views.parts import Parts, PartListView, PartStockMobilityView
 from .views.aircrafts import Aircrafts, AircraftListView, AircraftProductionListView
 from common.utils import logout
 from common.swagger import schema_view
 from rest_framework.routers import DefaultRouter
 
-# Routers
+# API Routers
 router = DefaultRouter()
 router.register(r"team", TeamViewSet)
 router.register(r"user", UserViewSet)
@@ -44,6 +44,11 @@ urlpatterns = [
         "aircraftProductionsData/",
         AircraftProductionListView.as_view(),
         name="aircraftProductionsData",
+    ),
+    path(
+        "partStockMobilityData/",
+        PartStockMobilityView.as_view(),
+        name="partStockMobilityData",
     ),
     # Swagger Router
     path(

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from ..models import Part, Part_stock, User
+from ..models import Part_stock, User, Part_stock_mobility, Part_stock_status
 from common.constants import Add_to_stock_process_type, Remove_from_stock_process_type
 from django_serverside_datatable.views import ServerSideDatatableView
 
@@ -36,6 +36,8 @@ class Parts(View):
         if part_stock is None:
             return redirect("/parts/")
 
+        status = None
+        description = ""
         try:
             # Check stock process type. It can be add or rermove
             stock_process_type = request.POST.get("stock_process_type")
@@ -43,7 +45,16 @@ class Parts(View):
             if stock_process_type == Add_to_stock_process_type:
                 amount_added = request.POST.get("amount_added")
                 part_stock.count += int(amount_added) or 0
-                part_stock.save()
+
+                # Retrieve stock increase status since a new parts are inserted to the stocks
+                status = Part_stock_status.objects.filter(
+                    name__icontains="increase"
+                ).first()
+
+                # Define a description to describe the process
+                description = (
+                    f"{amount_added} {part_stock.part.name} added to the stocks"
+                )
             # If process type is remove, then remove the parts from the stocks by amount
             elif stock_process_type == Remove_from_stock_process_type:
                 amount_removed = request.POST.get("amount_removed")
@@ -52,7 +63,31 @@ class Parts(View):
                 if part_stock.count < 0:
                     part_stock.count = 0
 
-                part_stock.save()
+                # Retrieve stock increase status since a new parts are inserted to the stocks
+                status = Part_stock_status.objects.filter(
+                    name__icontains="decrease"
+                ).first()
+
+                # Define a description to describe the process
+                description = (
+                    f"{amount_removed} {part_stock.part.name} removed from the stocks"
+                )
+
+            part_stock.save()
+
+            # If the status is defined, create a new mobility log in DB
+            if status is not None:
+                user_id = request.session["user_id"]
+                # Add a new log data in stock mobility
+                new_part_stock_mobility = Part_stock_mobility.objects.create(
+                    part_id=part_stock.part.id,
+                    status_id=status.id,
+                    # Create a description manually to describe the process
+                    description=description,
+                    user_id=user_id,
+                )
+
+                new_part_stock_mobility.save()
         except Exception as error:
             print("An error occurred while adding/removing a part", error)
 
@@ -60,5 +95,17 @@ class Parts(View):
 
 
 class PartListView(ServerSideDatatableView):
-    queryset = Part_stock.objects.all().order_by("part__name")
+    queryset = Part_stock.objects.all()
     columns = ["part__name", "part__description", "part__aircraft__name", "count"]
+
+
+class PartStockMobilityView(ServerSideDatatableView):
+    queryset = Part_stock_mobility.objects.all()
+    columns = [
+        "id",
+        "part__name",
+        "description",
+        "status__name",
+        "user__name",
+        "created_at"
+    ]

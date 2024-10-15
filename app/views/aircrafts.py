@@ -7,7 +7,6 @@ from ..models import (
     Part,
     Part_stock,
     Part_stock_mobility,
-    Part_stock_status,
     User,
 )
 from django_serverside_datatable.views import ServerSideDatatableView
@@ -17,6 +16,7 @@ from common.constants import (
     Completed,
     Canceled,
 )
+from common.utils import getStockPartStatus
 
 
 class Aircrafts(View):
@@ -95,9 +95,7 @@ class Aircrafts(View):
         # Retrieeve the related aircraft
         produced_aircraft = Aircraft.objects.filter(id=produce_aircraft_id).first()
         # Retrieve stock decrease status to use in mobility table
-        decrease_stock_status = Part_stock_status.objects.filter(
-            name__icontains="decrease"
-        ).first()
+        decrease_stock_status = getStockPartStatus(False)
 
         try:
             for i in range(0, int(amount_to_produce_aircraft)):
@@ -150,14 +148,44 @@ class Aircrafts(View):
         aircraft_production = Aircraft_production.objects.filter(
             id=aircraft_production_id
         ).first()
-        # Edit production's status according to the user action
+        # Edit production's status according to the user's action
         if status == Completed:
             aircraft_production.is_completed = True
         elif status == Canceled:
+            increase_stock_status = getStockPartStatus()
+            user_id = request.session["user_id"]
+
+            # The process is canceled, So the parts that were planned to be used should be added back to the stock
+            used_parts = aircraft_production.used_parts.all()
+            for used_part in used_parts:
+                part_stock = Part_stock.objects.filter(part_id=used_part.id).first()
+                # Increase stock count for the related part
+                part_stock.count += 1
+                # Update stock count
+                part_stock.save()
+
+                # Create a description manually to describe the cancel process
+                description = f"1 {used_part.name} is re-added to the stock cause the {aircraft_production.aircraft.name} (No: {aircraft_production.product_no}) aircraft production is canceled."
+
+                # Create a new mobility data in DB to log this stock process
+                new_part_stock_mobility = Part_stock_mobility.objects.create(
+                    aircraft_production_id=aircraft_production_id,
+                    part_id=used_part.id,
+                    # Stock will be increased since the parts will come back to the stock
+                    status_id=increase_stock_status.id,
+                    description=description,
+                    user_id=user_id,
+                )
+
+                # Save new stock mobility data
+                new_part_stock_mobility.save()
+
+            # As final, update aircraft production's status to mention it's canceled
             aircraft_production.is_canceled = True
         else:
             return redirect("/aircrafts/")
 
+        # Save latest updates and reload the window
         aircraft_production.save()
 
         return redirect("/aircrafts/")

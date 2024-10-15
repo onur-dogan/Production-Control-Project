@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from ..models import Part_stock, User, Part_stock_mobility, Part_stock_status
+from ..models import Part_stock, User, Part_stock_mobility
 from common.constants import Add_to_stock_process_type, Remove_from_stock_process_type
+from common.utils import getStockPartStatus
 from django_serverside_datatable.views import ServerSideDatatableView
 
 
@@ -47,9 +48,7 @@ class Parts(View):
                 part_stock.count += int(amount_added) or 0
 
                 # Retrieve stock increase status since a new parts are inserted to the stocks
-                status = Part_stock_status.objects.filter(
-                    name__icontains="increase"
-                ).first()
+                status = getStockPartStatus(True)
 
                 # Define a description to describe the process
                 description = (
@@ -63,10 +62,8 @@ class Parts(View):
                 if part_stock.count < 0:
                     part_stock.count = 0
 
-                # Retrieve stock increase status since a new parts are inserted to the stocks
-                status = Part_stock_status.objects.filter(
-                    name__icontains="decrease"
-                ).first()
+                # Retrieve stock decrease status since a new parts are inserted to the stocks
+                status = getStockPartStatus(False)
 
                 # Define a description to describe the process
                 description = (
@@ -105,7 +102,7 @@ class PartStockMobilityView(ServerSideDatatableView):
         "id",
         "part__name",
         "description",
-        "status__name",
         "user__name",
+        "status__name",
         "created_at"
     ]

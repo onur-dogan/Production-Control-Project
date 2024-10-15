@@ -48,34 +48,34 @@ docker-compose up
 ```
 
 ## Getting Started
-- After successfull deployment, open the [Sign Up](http://localhost:8000/signup/) page. Register to the system by filling the informations.
-- After registering successfully, [Login](http://localhost:8000/login/) page will display. Login to the system. One of the [Parts](#parts-parts), [Aircrafts](#aircrafts-aircrafts) pages opens according to the user's team.
+- Open the [Sign Up](http://localhost:8000/signup/) page after successful deployment. Register to the system by filling in the information.
+- After registering successfully, [Login](http://localhost:8000/login/) page will display. Log in to the system. One of the [Parts](#parts-parts), and [Aircrafts](#aircrafts-aircrafts) pages opens according to the user's team.
 
 
 ## Pages
 ### PARTS ("/parts")
-Part page lists the parts, stock informations and mobilities. Under the list tables, some forms exist. The user can add parts to the stock or remove parts from the stock via using these forms. 
+The part page lists the parts, stock information, and part stock mobilities. Under the list tables, some forms exist. The user can add parts to the stock or remove parts from the stock by using these forms. 
 
 **User Actions**
-- When the user adds any part to the stock, the stock count increases and a new mobility log creates. Otherwise, when the user removes a part from the stock, the stock count decreases and a new mobility log creates.
+- When the user adds any part to the stock, the stock count increases and a new mobility log is created. Otherwise, when the user removes a part from the stock, the stock count decreases and a new mobility log is created.
 
 **Permissions**
-- In this part, the user can make any process on only the parts which it has permission. However, it can list all of the parts on the tables. 
+- In this part, the user can make any process on only the parts for which it has permission. However, it can list all of the parts on the tables. 
 - On the other hand, the users who have permission to see [Aircrafts](#aircrafts-aircrafts) can see the part lists but can't make any stock process.
 
 ### AIRCRAFTS ("/aircrafts")
-Aircraft page lists the aircrafts, produced aircraft informations and aircraft production which is in progress. Under the aircraft list tables, there are some forms to assembly a new aircraft and list/manage the aircraft production processes. 
+The aircraft page lists the aircrafts, produced aircraft information, and aircraft production which is in progress. Under the aircraft list tables, there are some forms to assembly a new aircraft and list/manage the aircraft production processes. 
 
 **User Actions** 
-- While assemblying a new aircraft, the system checks the stocks whether the required parts are enough or missing in the stocks. According to the results, it shows warnings to the user or allow to assembly a new aircraft.
-- In the manage table, the user can change the aircraft produces statuses as completed or canceled. According to the selection, the stock counts update and new log creates for each process. They are listed on the [Part](#parts-parts) page.
+- While assembling a new aircraft, the system checks the stocks to see whether the required parts are enough or missing in the stocks. According to the results, when the parts are not enough in stock for the assembly of a new aircraft, it shows warnings to the user and doesn't allow to assembly
+- In the managing table, the user can change the aircraft produces status to completed or canceled. According to the selection, the stock counts are updated, and a new log is created for each process. They are listed on the [Part](#parts-parts) page.
 
 **Permissions**
-- Only the teams that have the permission could see this page. Other users don't have permission to open it.
+- Only the teams that have permission can see this page. Other users don't have permission to open it.
 
 
 ## Page Routes
-- [`/`](http://localhost:8080/) ==> Django Rest Framework Api Root Documentation
+- [`/`](http://localhost:8080/) ==> Django Rest Framework API Root Documentation
 - [`/login`](http://localhost:8000/login) ==> Login Page
 - [`/signup`](http://localhost:8000/signup) ==> Sign up Page
 - [`/parts`](http://localhost:8000/parts) ==> [Part](#parts-parts) Page

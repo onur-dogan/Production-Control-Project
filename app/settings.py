@@ -84,8 +84,7 @@ DATABASES = {
         "NAME": "uav-postgres-db",
         "USER": "uav-postgres",
         "PASSWORD": "uav-postgres",
-        "HOST": "127.0.0.1",
-        # 'db',
+        "HOST": 'db',
         "PORT": "5432",
     }
 }

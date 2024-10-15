@@ -11,14 +11,22 @@
 <style>
     .logout-button {
         position: absolute;
-        right: .50rem;
+        right: 2%;
         top: 3%;
-        width: 300px;
+        width: 200px;
         height: 50px;
         border-radius: 5px;
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .stock-decrease {
+        background-color: #fa020240 !important;
+    }
+
+    .stock-increase {
+        background-color: #2ff50740 !important;
     }
 </style>
 
@@ -41,6 +49,22 @@
             </thead>
             <tbody></tbody>
         </table>
+        <h1 class="d-flex justify-content-center text-decoration-underline">Part Stock Mobility</h1>
+        <hr>
+        <table id="aircraft-productions-table">
+            <thead>
+                <tr>
+                    <th>Part Name</th>
+                    <th>Description</th>
+                    <th>Process Type</th>
+                    <th>Done By</th>
+                    <th>Process Date</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <!-- If the user isn in the assembly team, then the user shouldn't have acces to edit part counts in stocks  -->
+        {% if has_assemble_permission is True %}
         <div class="row">
             <div class="col-6 mt-5">
                 <h1 class="d-flex justify-content-center text-decoration-underline">Add parts to stock</h1>
@@ -110,6 +134,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -118,6 +143,7 @@
         $(document).ready(function () {
             $('#parts-table').dataTable({
                 serverSide: true,
+                responsive: true,
                 sAjaxSource: "http://localhost:8000/partsData/",
                 columns: [
                     {
@@ -137,6 +163,47 @@
                         data: 3
                     }
                 ]
+            });
+
+            const dateFormatter = date => new Date(date).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+            $(document).ready(function () {
+                $('#aircraft-productions-table').dataTable({
+                    serverSide: true,
+                    sAjaxSource: "http://localhost:8000/partStockMobilityData/",
+                    createdRow: (row, data) => {
+                        const [, , , status] = data;
+                        /** 
+                        * Display red color on background for stock decrease processes
+                        * Display green color on background for stock increase processes
+                        */
+                        $(row).addClass(status.toLowerCase().includes('increase') ? 'stock-increase' : 'stock-decrease')
+                    },
+                    // Sort by id to display the latest added log in the first row
+                    order: [[0, "desc"]],
+                    columns: [
+                        {
+                            name: "part_name",
+                            data: 1
+                        },
+                        {
+                            name: "description",
+                            data: 2
+                        },
+                        {
+                            name: "status",
+                            data: 3
+                        },
+                        {
+                            name: "done_by",
+                            data: 4
+                        },
+                        {
+                            name: "created_at",
+                            data: 5,
+                            render: dateFormatter
+                        },
+                    ]
+                });
             });
         });
     </script>

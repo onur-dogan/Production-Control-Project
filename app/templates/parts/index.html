@@ -64,7 +64,7 @@
             <tbody></tbody>
         </table>
         <!-- If the user isn in the assembly team, then the user shouldn't have acces to edit part counts in stocks  -->
-        {% if has_assemble_permission is True %}
+        {% if has_assemble_permission is not True %}
         <div class="row">
             <div class="col-6 mt-5">
                 <h1 class="d-flex justify-content-center text-decoration-underline">Add parts to stock</h1>

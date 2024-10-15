@@ -38,7 +38,7 @@ class Aircrafts(View):
         # Retrieve aircraft_production which is in progress (Waiting to be completed/canceled)
         in_progress_aircrafts = Aircraft_production.objects.filter(
             is_completed=False, is_canceled=False
-        )
+        ).order_by("product_no")
 
         # If an aircraft is selected, retrieve required parts to display on the UI
         produce_aircraft_id = request.GET.get("produce_aircraft_id")
@@ -88,7 +88,9 @@ class Aircrafts(View):
         produce_aircraft_id = request.POST.get("produce_aircraft_id")
         amount_to_produce_aircraft = request.POST.get("amount_to_produce_aircraft")
 
-        latest_aircraft_production = Aircraft_production.objects.last()
+        latest_aircraft_production = Aircraft_production.objects.order_by(
+            "product_no"
+        ).last()
         # Set the latest product no to the aircraft.
         # Quick Note: product no can be defined as a string if any string would be used in it
         parts = Part.objects.filter(aircraft_id=produce_aircraft_id)
@@ -101,7 +103,7 @@ class Aircrafts(View):
             for i in range(0, int(amount_to_produce_aircraft)):
                 # Increase 1 for each new product. They should be in order like: 1, 2, 3, ...
                 product_no = (
-                    int(latest_aircraft_production.product_no) + i
+                    int(latest_aircraft_production.product_no) + i + 1
                     if latest_aircraft_production is not None
                     else i + 1
                 )
@@ -199,7 +201,7 @@ class AircraftListView(ServerSideDatatableView):
 class AircraftProductionListView(ServerSideDatatableView):
     queryset = Aircraft_production.objects.filter(
         Q(is_completed=True) | Q(is_canceled=True)
-    ).order_by("updated_at")
+    ).order_by("product_no")
     columns = [
         "product_no",
         "aircraft__name",

@@ -50,6 +50,13 @@
                 background-repeat: no-repeat, no-repeat;
             }
         }
+
+        .warning_text {
+            color: rgb(189, 2, 2);
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
     </style>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://www.google.com/recaptcha/api.js?hl=en"></script>
@@ -86,7 +93,7 @@
                                     {% csrf_token %}
                                     <div class="mb-3" style="width: 330px">
                                         <label class="form-label">E-mail</label>
-                                        <input type="email" name="login" required class="form-control"
+                                        <input type="email" name="email" required class="form-control"
                                             aria-describedby="emailHelp" placeholder="Enter E-mail" />
                                     </div>
                                     <div class="mb-3" style="width: 330px; position: relative">
@@ -105,9 +112,12 @@
                           " onclick="togglePasswordVisibility()"></span>
                                         </div>
                                     </div>
-                                    <div class="LoginBottom">
+                                    <!-- <div class="LoginBottom">
                                         <a class="pass" href="/en/hesaplar/password/reset/">Forgot my Password</a>
-                                    </div>
+                                    </div> -->
+                                    {% if wrong_recaptcha == 'true' %}
+                                    <p class="warning_text">You cannot pass without marking "I'm not a robot" box</p>
+                                    {% endif %}
                                     <div class="mb-10 mt-3  d-flex justify-content-center">
                                         <script src="https://www.google.com/recaptcha/api.js"></script>
                                         <script type="text/javascript">
@@ -123,6 +133,9 @@
                                             data-size="normal">
                                         </div>
                                     </div>
+                                    {% if wrong_info == 'true' %}
+                                    <p class="warning_text mt-2">We cannot find an account with that information</p>
+                                    {% endif %}
                                     <div class="forgetButtons">
                                         <button type="submit" class="login-btn">
                                             LOGIN
@@ -130,7 +143,7 @@
                                     </div>
                                 </form>
                                 <div class="createAccount">
-                                    <p>Not a Member ? <a href="/en/hesaplar/signup/">Create Account</a></p>
+                                    <p>Not a Member ? <a href="/signup">Create Account</a></p>
                                 </div>
                             </div>
                         </div>

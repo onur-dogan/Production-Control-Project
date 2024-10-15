@@ -5,6 +5,7 @@ from common.constants import (
     Team,
     Part,
     Part_stock_status,
+    Part_stock,
     Aircrafts as aircrafts,
     Parts as parts,
     Part_stock_statuses as part_stock_statuses,
@@ -69,6 +70,29 @@ def createInitialPartData(apps):
     )
 
 
+def createInitialPartStockData(apps):
+    # Get Part stock model
+    part_stock_model = apps.get_model("app", Part_stock)
+    # Create the default part stocks for 0 count as initially
+    part_stock_model.objects.bulk_create(
+        [
+            # Model Example: { id: 4, part_id: 4, count: 0 }
+            part_stock_model(
+                # Give id automatically between 1,16(4*4 - There are 4 aircraft and 4 parts)
+                id=(aircraft_index * 4) + (part_index + 1),
+                # The part's id will be the same between 1,16(4*4 - There are 4 aircraft and 4 parts)
+                part_id=(aircraft_index * 4) + (part_index + 1),
+                # Beginning stock count is 0 for each part
+                count=0,
+            )
+            # Loop the aircrafts since each part should be defined for each aircraft specially
+            for aircraft_index in range(0, len(aircrafts))
+            # Then, loop the parts and assign them to the aircrafts one on one
+            for part_index in range(0, len(parts))
+        ]
+    )
+
+
 def createInitialPartStockStatusData(apps):
     # Get Part Stock Status model
     part_stock_status_model = apps.get_model("app", Part_stock_status)
@@ -91,6 +115,7 @@ def createInitialData(apps, schema):
     createInitialAircraftData(apps)
     createInitialPartData(apps)
     createInitialPartStockStatusData(apps)
+    createInitialPartStockData(apps)
 
 
 class Migration(migrations.Migration):
@@ -103,7 +128,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Aircraft",
             fields=[
-                ("id", models.IntegerField(primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("name", models.CharField(max_length=255)),
                 ("description", models.TextField(max_length=3000, null=True)),
                 ("is_active", models.BooleanField(default=True)),
@@ -112,9 +145,41 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name="Aircraft_production",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("product_no", models.IntegerField()),
+                ("is_completed", models.BooleanField(default=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "aircraft",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="app.aircraft"
+                    ),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
             name="Part",
             fields=[
-                ("id", models.IntegerField(primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("name", models.CharField(max_length=255)),
                 ("description", models.TextField(max_length=3000, null=True)),
                 ("is_active", models.BooleanField(default=True)),
@@ -131,7 +196,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Part_stock_status",
             fields=[
-                ("id", models.IntegerField(primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("name", models.CharField(max_length=255)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
@@ -139,7 +212,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Team",
             fields=[
-                ("id", models.IntegerField(primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("name", models.CharField(max_length=255)),
                 ("has_assemble_permission", models.BooleanField(default=False)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
@@ -148,9 +229,18 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="User",
             fields=[
-                ("id", models.IntegerField(primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("name", models.TextField(max_length=255)),
                 ("surname", models.TextField(max_length=255)),
+                ("email", models.CharField(max_length=255)),
                 ("password", models.CharField(max_length=255)),
                 ("is_active", models.BooleanField(default=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
@@ -168,15 +258,23 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Part_stock_mobility",
             fields=[
-                ("id", models.IntegerField(primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("description", models.TextField(max_length=1000)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 (
-                    "aircraft",
+                    "aircraft_production",
                     models.ForeignKey(
                         null=True,
                         on_delete=django.db.models.deletion.PROTECT,
-                        to="app.aircraft",
+                        to="app.aircraft_production",
                     ),
                 ),
                 (
@@ -203,7 +301,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Part_stock",
             fields=[
-                ("id", models.IntegerField(primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("count", models.IntegerField(default=0)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
                 (
@@ -221,28 +327,17 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.PROTECT, to="app.team"
             ),
         ),
-        migrations.CreateModel(
-            name="Aircraft_production",
-            fields=[
-                ("id", models.IntegerField(primary_key=True, serialize=False)),
-                ("product_no", models.IntegerField()),
-                ("is_completed", models.BooleanField(default=False)),
-                ("created_at", models.DateTimeField(auto_now_add=True)),
-                ("updated_at", models.DateTimeField(auto_now=True)),
-                (
-                    "aircraft",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.PROTECT, to="app.aircraft"
-                    ),
-                ),
-                ("used_parts", models.ManyToManyField(to="app.part")),
-                (
-                    "user",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.PROTECT, to="app.user"
-                    ),
-                ),
-            ],
+        migrations.AddField(
+            model_name="aircraft_production",
+            name="used_parts",
+            field=models.ManyToManyField(to="app.part"),
+        ),
+        migrations.AddField(
+            model_name="aircraft_production",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="app.user"
+            ),
         ),
         migrations.RunPython(createInitialData),
     ]

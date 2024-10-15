@@ -82,8 +82,8 @@ def createInitialPartStockData(apps):
                 id=(aircraft_index * 4) + (part_index + 1),
                 # The part's id will be the same between 1,16(4*4 - There are 4 aircraft and 4 parts)
                 part_id=(aircraft_index * 4) + (part_index + 1),
-                # Beginning stock count is 0 for each part
-                count=0,
+                # Beginning stock count should be 0 for each part but for easy testing, it is good to set them as 10
+                count=10,
             )
             # Loop the aircrafts since each part should be defined for each aircraft specially
             for aircraft_index in range(0, len(aircrafts))

@@ -15,7 +15,6 @@ Parts = ["Wing", "Fuselage", "Tail", "Avionics"]
 # Part stock status constants
 Part_stock_statuses = ["Stock Increase", "Stock Decrease"]
 
-
 # The query parameters that are used in login page to show warning message to the user
 # Recaptcha warning query parameter to show warning message if the user doesn't click on it
 Wrong_recaptcha_query_parameter = "wrong_recaptcha"
@@ -34,8 +33,14 @@ Assembly_aircraft = "assembly_aircraft"
 # Uses to update aircraft production's status
 Update_aircraft_production_status = "update_aircraft_production_status"
 
-
-# Completed status
+# Aircraft production statuses 
+# Use for the completed processes status
 Completed = "completed"
-# Canceled status
+# Use for the canceled processes status
 Canceled = "canceled"
+
+# Part stock mobility statuses
+# Use for mentioning that new parts were added to the stock 
+Increase = "increase"  
+# Use for mentioning that some parts were removed from the stock
+Decrease = "decrease"

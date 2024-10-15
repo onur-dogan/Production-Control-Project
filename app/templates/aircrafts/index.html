@@ -34,11 +34,29 @@
         justify-content: center;
         align-items: center;
     }
+
+    .canceled-production {
+        background-color: #fa020240 !important;
+    }
+
+    .logout-button {
+        position: absolute;
+        right: .50rem;
+        top: 3%;
+        width: 300px;
+        height: 50px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 </style>
 
 <body>
     <div class="m-5">
+        <a href="/parts/" style="position: absolute;"> See Parts --> </a>
         <h1 class="d-flex justify-content-center text-decoration-underline">Aircrafts</h1>
+        <a href="/logout/" class="btn btn-info logout-button"> Logout </a>
         <hr>
         <table id="aircrafts-table">
             <thead>
@@ -54,14 +72,18 @@
         <table id="aircraft-productions-table">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Description</th>
+                    <th>Aircraft No</th>
+                    <th>Aircraft Name</th>
+                    <th>Production Planner</th>
+                    <th>Production Start Date</th>
+                    <th>Production Complete/Cancel Date</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-        <div class="row">
-            <div class="col-6 mt-5">
+        <div class="row mt-5">
+            <div class="col-6">
                 <h1 class="d-flex justify-content-center text-decoration-underline">Assemble an aircraft</h1>
                 <div class="row align-items-center">
                     <form method="get">
@@ -135,6 +157,7 @@
                         {% csrf_token %}
                         <input hidden value="{{ produce_aircraft_id }}" name="produce_aircraft_id" />
                         <input hidden value="{{ amount_to_produce_aircraft }}" name="amount_to_produce_aircraft" />
+                        <input hidden value="assembly_aircraft" name="process_type" />
                         <div class="d-flex justify-content-center align-items-center mt-3">
                             <button type="submit" id="show_requirements" class="btn btn-primary">
                                 Assembly
@@ -148,6 +171,48 @@
                     </form>
                     {% endif %}
                 </div>
+            </div>
+            <div class="col-1"></div>
+            <div class="col-5">
+                <h1 class="d-flex mb-4 justify-content-center text-decoration-underline">
+                    Aircraft Productions (In Progress)
+                </h1>
+                {% if in_progress_aircrafts.count > 0 %}
+                <div class="row list-titles">
+                    <div class="col-2 center-text">Aircraft No</div>
+                    <div class="col-3 center-text">Aircraft Name</div>
+                    <div class="col-4 center-text">Production Start Date</div>
+                    <div class="col-3 center-text">Complete</div>
+                </div>
+                {% else %}
+                <h4 class="text-decoration-underline text-center text-secondary">
+                    There's no aircraft production in progress
+                    </h3>
+                    {% endif %}
+                    {% for in_progress_aircraft in in_progress_aircrafts %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input hidden value="{{in_progress_aircraft.id}}" name="aircraft_production_id" />
+                        <input hidden value="update_aircraft_production_status" name="process_type" />
+                        <div class="row mt-3">
+                            <div class="col-2 center-text">{{in_progress_aircraft.product_no}}</div>
+                            <div class="col-3 center-text">{{in_progress_aircraft.aircraft.name}}</div>
+                            <div class="col-4 center-text">{{in_progress_aircraft.created_at|date:"M d, Y"}}</div>
+                            <div class="col-3 center-text">
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <button title="Update related production as completed" value="completed"
+                                        name="status" type="submit" class="btn btn-success">
+                                        Complete
+                                    </button>
+                                    <button title="Update related production as canceled" value="canceled" name="status"
+                                        type="submit" class="btn btn-danger ms-2">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    {% endfor %}
             </div>
         </div>
     </div>
@@ -171,18 +236,44 @@
                 ]
             });
         });
+
+        const dateFormatter = date => new Date(date).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
         $(document).ready(function () {
             $('#aircraft-productions-table').dataTable({
                 serverSide: true,
                 sAjaxSource: "http://localhost:8000/aircraftProductionsData/",
+                createdRow: (row, data) => {
+                    const [, , , , , isCompleted] = data;
+                    // Display red color on background for the production which is canceled
+                    if (!isCompleted) $(row).addClass('canceled-production')
+                },
                 columns: [
                     {
-                        name: "name",
+                        name: "product_no",
                         data: 0
                     },
                     {
-                        name: "description",
+                        name: "aircraft_name",
                         data: 1
+                    },
+                    {
+                        name: "user_name",
+                        data: 2
+                    },
+                    {
+                        name: "created_at",
+                        data: 3,
+                        render: dateFormatter
+                    },
+                    {
+                        name: "updated_at",
+                        data: 4,
+                        render: dateFormatter
+                    },
+                    {
+                        name: "is_completed",
+                        data: 5,
+                        render: data => data ? "Completed" : "Canceled"
                     }
                 ]
             });

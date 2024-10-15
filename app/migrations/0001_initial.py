@@ -158,6 +158,7 @@ class Migration(migrations.Migration):
                 ),
                 ("product_no", models.IntegerField()),
                 ("is_completed", models.BooleanField(default=False)),
+                ("is_canceled", models.BooleanField(default=False)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
                 (

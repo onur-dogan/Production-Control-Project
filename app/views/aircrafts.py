@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views import View
+from django.db.models import Q
 from ..models import (
     Aircraft,
     Aircraft_production,
@@ -10,6 +11,12 @@ from ..models import (
     User,
 )
 from django_serverside_datatable.views import ServerSideDatatableView
+from common.constants import (
+    Assembly_aircraft,
+    Update_aircraft_production_status,
+    Completed,
+    Canceled,
+)
 
 
 class Aircrafts(View):
@@ -27,6 +34,11 @@ class Aircrafts(View):
 
         # Retrieve all aircrafts
         aircrafts = Aircraft.objects.filter(is_active=True).order_by("name")
+
+        # Retrieve aircraft_production which is in progress (Waiting to be completed/canceled)
+        in_progress_aircrafts = Aircraft_production.objects.filter(
+            is_completed=False, is_canceled=False
+        )
 
         # If an aircraft is selected, retrieve required parts to display on the UI
         produce_aircraft_id = request.GET.get("produce_aircraft_id")
@@ -56,11 +68,22 @@ class Aircrafts(View):
             "selected_aircraft": aircrafts.filter(id=produce_aircraft_id).first(),
             "amount_to_produce_aircraft": int(amount_to_produce_aircraft),
             "is_available_to_reproduce": is_available_to_reproduce,
+            "in_progress_aircrafts": in_progress_aircrafts,
         }
 
         return render(request, "aircrafts/index.html", data)
 
     def post(self, request):
+        process_type = request.POST.get("process_type")
+        if process_type == Assembly_aircraft:
+            return self.assembly_aircraft(request)
+        elif process_type == Update_aircraft_production_status:
+            return self.update_aircraft_production_status(request)
+
+        # If it comes for another reason, then no need to do anything. Just refresh the window
+        return redirect("/aircrafts/")
+
+    def assembly_aircraft(self, request):
         user_id = request.session["user_id"]
         produce_aircraft_id = request.POST.get("produce_aircraft_id")
         amount_to_produce_aircraft = request.POST.get("amount_to_produce_aircraft")
@@ -107,7 +130,7 @@ class Aircrafts(View):
                             status_id=decrease_stock_status.id,
                             # Create a description manually to describe the process
                             description=f"1 {used_part.name} has used for assemblying the {produced_aircraft.name}(No: {product_no})",
-                            user_id=user_id
+                            user_id=user_id,
                         )
 
                         # Decrease the part stock and log the stock processes
@@ -120,6 +143,25 @@ class Aircrafts(View):
 
         return redirect("/aircrafts/")
 
+    def update_aircraft_production_status(self, request):
+        aircraft_production_id = request.POST.get("aircraft_production_id")
+        status = request.POST.get("status")
+
+        aircraft_production = Aircraft_production.objects.filter(
+            id=aircraft_production_id
+        ).first()
+        # Edit production's status according to the user action
+        if status == Completed:
+            aircraft_production.is_completed = True
+        elif status == Canceled:
+            aircraft_production.is_canceled = True
+        else:
+            return redirect("/aircrafts/")
+
+        aircraft_production.save()
+
+        return redirect("/aircrafts/")
+
 
 class AircraftListView(ServerSideDatatableView):
     queryset = Aircraft.objects.filter(is_active=True).order_by("name")
@@ -127,11 +169,14 @@ class AircraftListView(ServerSideDatatableView):
 
 
 class AircraftProductionListView(ServerSideDatatableView):
-    queryset = Aircraft_production.objects.all().order_by("updated_at")
+    queryset = Aircraft_production.objects.filter(
+        Q(is_completed=True) | Q(is_canceled=True)
+    ).order_by("updated_at")
     columns = [
         "product_no",
         "aircraft__name",
-        "used_parts",
-        "is_completed",
         "user__name",
+        "created_at",
+        "updated_at",
+        "is_completed",
     ]

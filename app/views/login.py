@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import check_password
 from django.shortcuts import render, redirect
 from django.views import View
 from ..models import User
@@ -8,6 +9,12 @@ class Login(View):
 
     def get(self, request):
         try:
+            # Check whether the user logged in to the system
+            user_id = request.session["user_id"]
+            # If the user has already logged in, then redirect it to one of the main windows
+            if user_id is not None:
+                return redirect("/parts/")
+
             # If wrong_recaptcha query parameter sent as "true", show a warning on UI
             wrong_recaptcha = request.GET.get(Wrong_recaptcha_query_parameter)
             # If wrong_info query parameter sent as "true", show a warning on UI
@@ -33,12 +40,18 @@ class Login(View):
 
         email = request.POST.get("email")
         password = request.POST.get("password")
-        # Check user information
-        user = User.objects.filter(email=email, password=password).first()
+        # Check user information by email first
+        user = User.objects.filter(email=email).first()
         # If the user informations don't correct, send a query parameter to display a warning message on UI
         if user is None:
             return redirect("/login?wrong_info=true")
 
+        # Check the entered password by comparing it with the hashed password in DB
+        is_user_password_correct = check_password(password, user.password)
+        if is_user_password_correct is False:
+            return redirect("/login?wrong_info=true")
+
+        # ** User logged in to the system successfully **
         # Store/cache related user's id in session
         request.session["user_id"] = user.id
 

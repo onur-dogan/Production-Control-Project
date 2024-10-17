@@ -80,7 +80,7 @@ The aircraft page lists the aircrafts, produced aircraft information, and aircra
 - [`/signup`](http://localhost:8000/signup) ==> Sign up Page
 - [`/parts`](http://localhost:8000/parts) ==> [Part](#parts-parts) Page
 - [`/aircrafts`](http://localhost:8000/aircrafts) ==> [Aircraft](#aircrafts-aircrafts) Page
-- [`swagger`](http://localhost:8000/swagger) ==> Swagger Documentation
+- [`/swagger`](http://localhost:8000/swagger) ==> Swagger Documentation
 - [`/admin`](http://localhost:8080/admin) ==> Django Administration Page
 
 

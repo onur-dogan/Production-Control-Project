@@ -1,6 +1,6 @@
-# UAV-Rental-Project-with-Django
+# UAV-Rental-Project
 
-***UAV Rental Project with Django*** 
+***UAV Rental Project*** 
 
 ## Table of Contents
 - [About](#about)

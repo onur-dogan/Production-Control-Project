@@ -12,7 +12,7 @@
 - [Routes](#page-routes)
 
 ## About
-**UAV Rental Project** is a project that allows users to manage aircraft production processes and part stock tracking
+**Production Control Project** is a project that allows users to manage aircraft production processes and part stock tracking
 
 ## Built With
 * [![Django][Django.com]][Django-url]
@@ -35,10 +35,10 @@ To build the packages, follow these steps:
 # Open a terminal (Command Prompt or PowerShell for Windows, Terminal for macOS/Linux)
 
 # Clone the repository
-git clone https://github.com/onur-dogan/UAV-Rental-Project-with-Django.git
+git clone https://github.com/onur-dogan/Production-Control-Project.git
 
 # Navigate to the project's root directory
-cd UAV-Rental-Project-with-Django
+cd Production-Control-Project
 
 # Build docker 
 docker-compose build
